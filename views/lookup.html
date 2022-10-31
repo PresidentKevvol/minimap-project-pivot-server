@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Lookup page</title>
+  </head>
+  <body>
+    <h2>Current beacon readings</h2>
+    <table>
+      <tr>
+        <th>Beacon</th>
+        <th>Time</th>
+        <th>SSID</th>
+        <th>BSSID</th>
+        <th>Channel</th>
+        <th>RSSI</th>
+      </tr>
+      {{ range $key, $value := . }}
+      <tr>
+        <td>{{ $key }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      {{ range $i := $value }}
+      <tr>
+        <td></td>
+        <td></td>
+        <td>{{ $i.SSID }}</td>
+        <td>{{ $i.BSSID }}</td>
+        <td>{{ $i.Channel }}</td>
+        <td>{{ $i.RSSI }}</td>
+      </tr>
+      {{ end }}
+      {{ end }}
+    </table>
+  </body>
+</html>

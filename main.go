@@ -27,6 +27,7 @@ type BeaconPayload struct {
 
 type AccessPointInfo struct {
   SSID      string
+  BSSID     string
   Channel   int32
   RSSI      float32
 }
@@ -38,7 +39,8 @@ var ex, exerr = os.Executable()
 var workdir = filepath.Dir(ex)
 var page_templates = template.Must(template.ParseFiles(
   workdir + "/views/index.html",
-  workdir + "/views/updateinfo.html"))
+  workdir + "/views/updateinfo.html",
+  workdir + "/views/lookup.html"))
 
 //the handler for the index page
 func handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -56,18 +58,29 @@ func handleBeaconUpdate(w http.ResponseWriter, r *http.Request) {
   var content_json BeaconPayload
   err := decoder.Decode(&content_json)
   if err != nil {
-        panic(err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
   }
-  fmt.Printf("content_json.SourceName = %s\n", content_json.SourceName)
-  fmt.Printf("content_json.Numbers[1] = %f\n", content_json.Points[1])
+  // fmt.Printf("content_json.SourceName = %s\n", content_json.SourceName)
+  // fmt.Printf("content_json.Numbers[1] = %f\n", content_json.Points[1])
   // address := r.FormValue("address")
 	// fmt.Fprintf(w, "Address = %s\n", address)
 
   // TODO: record reported information of signal strengths
+  //dt := time.Now()   //record current time
   beaconValues[content_json.SourceName] = content_json.Points
 
   //render template
   err = page_templates.ExecuteTemplate(w, "updateinfo.html", EmptyContext {})
+  if err != nil { //if there is an error
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+}
+
+// the handler for displaying the debug page with lookup for the values
+func handleUpdateLookup(w http.ResponseWriter, r *http.Request) {
+  //render template
+  err := page_templates.ExecuteTemplate(w, "lookup.html", beaconValues)
   if err != nil { //if there is an error
     http.Error(w, err.Error(), http.StatusInternalServerError)
   }
@@ -86,6 +99,7 @@ func main() {
   //define handler functions for pages
   http.HandleFunc("/", handleIndex)
   http.HandleFunc("/p/", handleBeaconUpdate)
+  http.HandleFunc("/l/", handleUpdateLookup)
 
   //the handler for ajax requests
   //http.HandleFunc("/ajax/createpost/", handleAjaxCreatePost)
@@ -98,7 +112,7 @@ func main() {
   //setup the hostname env variable
   hostname := os.Getenv("host_name")
   if hostname == "" {
-    hostname = ":8880"
+    hostname = ":8884"
   }
   //see if there is a ssl cert to be used
   ssl_cert := os.Getenv("ssl_cert")
