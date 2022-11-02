@@ -26,6 +26,7 @@ type BeaconRecord struct {
   Points []AccessPointInfo
 }
 
+/*
 type BeaconReadingsList struct {
   Capacity int
   Records []BeaconRecord
@@ -42,6 +43,7 @@ func (self *BeaconReadingsList) Push(br BeaconRecord) {
     self.Records = self.Records[1:]
   }
 }
+*/
 
 type BeaconValuesDatabase struct {
   Capacity int
