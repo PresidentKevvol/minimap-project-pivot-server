@@ -7,7 +7,7 @@ import (
   //"strconv"
   "log"
   //"math/rand"
-  //"time"
+  "time"
   "net/http"
   "path/filepath"
   "html/template"
@@ -17,22 +17,8 @@ import (
   //"github.com/gorilla/websocket"
 )
 
-type EmptyContext struct {
-}
-
-type BeaconPayload struct {
-  SourceName string
-  Points []AccessPointInfo
-}
-
-type AccessPointInfo struct {
-  SSID      string
-  BSSID     string
-  Channel   int32
-  RSSI      float32
-}
-
-var beaconValues map[string][]AccessPointInfo = make(map[string][]AccessPointInfo)
+//record the signal strengths value readings from the beacons
+var beaconValues BeaconValuesDatabase = BeaconValuesDatabase {Capacity: 6, Bmap: make(map[string][]BeaconRecord)}
 
 //template for the pages
 var ex, exerr = os.Executable()
@@ -67,8 +53,9 @@ func handleBeaconUpdate(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintf(w, "Address = %s\n", address)
 
   // TODO: record reported information of signal strengths
-  //dt := time.Now()   //record current time
-  beaconValues[content_json.SourceName] = content_json.Points
+  dt := time.Now()   //record current time
+  record := BeaconRecord {RecordTime: dt, Points: content_json.Points}
+  beaconValues.Push(content_json.SourceName, record)
 
   //render template
   err = page_templates.ExecuteTemplate(w, "updateinfo.html", EmptyContext {})

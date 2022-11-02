@@ -15,7 +15,7 @@
         <th>Channel</th>
         <th>RSSI</th>
       </tr>
-      {{ range $key, $value := . }}
+      {{ range $key, $reading := .Bmap }}
       <tr>
         <td>{{ $key }}</td>
         <td></td>
@@ -24,7 +24,16 @@
         <td></td>
         <td></td>
       </tr>
-      {{ range $i := $value }}
+      {{ range $instance := $reading }}
+      <tr>
+        <td></td>
+        <td>{{ $instance.RecordTime.Format "2006-01-02 15:04:05.000" }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      {{ range $i := $instance.Points }}
       <tr>
         <td></td>
         <td></td>
@@ -33,6 +42,7 @@
         <td>{{ $i.Channel }}</td>
         <td>{{ $i.RSSI }}</td>
       </tr>
+      {{ end }}
       {{ end }}
       {{ end }}
     </table>
