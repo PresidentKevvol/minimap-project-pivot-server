@@ -2,7 +2,7 @@ package main
 
 import (
   "time"
-  "fmt"
+  //"fmt"
 )
 
 type EmptyContext struct {
@@ -66,11 +66,11 @@ func (self *BeaconValuesDatabase) Push(name string, br BeaconRecord) {
   // Discard last element if capacity (of this beacon's list) reached
   m, _ = self.Bmap[name]
   if self.Capacity > 0 && len(m) > self.Capacity {
-    fmt.Printf("records removed.")
+    // fmt.Printf("records removed.")
     // self.Records = self.Records[1:]
     self.Bmap[name] = m[1:]
   }
 
   // fmt.Printf("self.Bmap[name]: %+v\n", m)
-  fmt.Printf("Database: %+v\n", self)
+  // fmt.Printf("Database: %+v\n", self)
 }
