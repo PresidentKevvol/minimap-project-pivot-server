@@ -21,9 +21,12 @@ import (
 var beaconValues BeaconValuesDatabase = BeaconValuesDatabase {Capacity: 6, Bmap: make(map[string][]BeaconRecord)}
 
 //check the beaconupdates sources' authenticity
-var check_req_auth = true
+var check_req_auth = false
 // the beacon names ('usernames') and passwords
 var auth_pw_map = make(map[string]string)
+
+// where to store the collected fingerprint data
+var fingerprint_data_storage string
 
 func main() {
   //load the .env file
@@ -31,6 +34,8 @@ func main() {
   if err != nil {
     log.Fatal("Error loading .env file")
   }
+
+  fingerprint_data_storage = os.Getenv("FINGERPRINT_DATA_DESTINATION")
 
   //print the current working directory
   fmt.Println("directory of this executable: " + workdir)

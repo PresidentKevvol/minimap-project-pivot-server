@@ -75,13 +75,28 @@ func (self *BeaconValuesDatabase) Push(name string, br BeaconRecord) {
   // fmt.Printf("Database: %+v\n", self)
 }
 
+type UserAccessPointInfo struct {
+  SSID      string
+  BSSID     string
+  Quality   float32
+}
+
 type PositioningRequestPayload struct {
-  Points            []AccessPointInfo
+  Points            []UserAccessPointInfo
 }
 
 type FingerprintDataCollectPayload struct {
   SourceName        string
   SourceDeviceId    string
-  Points            []AccessPointInfo
+  Points            []UserAccessPointInfo
   SpatialPosition   []float32
+}
+
+type FingerprintDataPoint struct {
+  SourceName        string
+  SourceDeviceId    string
+  SourceReadings    []UserAccessPointInfo
+  SpatialPosition   []float32
+
+  BeaconReadings    map[string][]AccessPointInfo
 }

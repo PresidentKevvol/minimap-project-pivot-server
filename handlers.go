@@ -12,7 +12,7 @@ import (
   "path/filepath"
   "html/template"
   "encoding/json"
-	//"io/ioutil"
+	"io/ioutil"
   //"github.com/gorilla/websocket"
 )
 
@@ -101,7 +101,40 @@ func handleFingerprintDataCollect(w http.ResponseWriter, r *http.Request) {
         return
   }
 
+  // retrieve latest reading of each beacon
+  brs := make(map[string][]AccessPointInfo)
+  for k, v := range beaconValues.Bmap {
+    pts := v[0].Points
+    brs[k] = pts
+  }
 
+  res := FingerprintDataPoint {
+    SourceName        : content_json.SourceName,
+    SourceDeviceId    : content_json.SourceDeviceId,
+    SourceReadings    : content_json.Points,
+    SpatialPosition   : content_json.SpatialPosition,
+    BeaconReadings    : brs,
+  }
+
+  dt := time.Now()   //record current time
+  filename := dt.Format("2006_01_02_15_04_05_000") + "-" + content_json.SourceName + ".json"
+
+  // write the point to a file
+  obj, err := json.Marshal(res)
+  //obj, err := json.MarshalIndent(res, "", " ")
+  if err != nil { //if there is an error
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+  err = ioutil.WriteFile(fingerprint_data_storage + filename, obj, 0644)
+  if err != nil { //if there is an error
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+
+  //render template
+  err = page_templates.ExecuteTemplate(w, "updateinfo.html", EmptyContext {})
+  if err != nil { //if there is an error
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
 }
 
 // the handler for calculating the position with naive method
