@@ -73,6 +73,8 @@ func handleBeaconUpdate(w http.ResponseWriter, r *http.Request) {
   dt := time.Now()   //record current time
   record := BeaconRecord {RecordTime: dt, Points: content_json.Points}
   beaconValues.Push(content_json.SourceName, record)
+  //record to redis server too
+  writeBeaconRecord(content_json.SourceName, record)
 
   //render template
   err = page_templates.ExecuteTemplate(w, "updateinfo.html", EmptyContext {})

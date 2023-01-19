@@ -50,6 +50,9 @@ func main() {
   //setup the auth passwords
   auth_pw_map["SBU-01"] = "cghj1A90tS3h7Msd"
 
+  //setup the redis connection
+  redisInit(os.Getenv("REDIS_IP"), os.Getenv("REDIS_PW"), false)
+
   //the handler for ajax requests
   //http.HandleFunc("/ajax/createpost/", handleAjaxCreatePost)
 
