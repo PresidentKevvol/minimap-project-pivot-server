@@ -17,7 +17,6 @@ import (
 
 var ctx = context.Background()
 var rdb *redis.Client
-var BeaconValuesDBCapacity int64 = 6
 
 /*
 initialize the setup for using redis in this server application
@@ -70,7 +69,7 @@ func writeBeaconRecord(name string, br BeaconRecord) {
     return
   }
   //trim list as needed
-  _, err = rdb.LTrim(ctx, "BeaconRecord-" + name, 0, BeaconValuesDBCapacity).Result()
+  _, err = rdb.LTrim(ctx, "BeaconRecord-" + name, 0, int64(BeaconValuesDBCapacity)).Result()
   if err != nil {
     fmt.Println(err)
     return

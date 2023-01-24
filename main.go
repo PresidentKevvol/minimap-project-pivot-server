@@ -4,7 +4,7 @@ import (
   "fmt"
   "os"
   //"strings"
-  //"strconv"
+  "strconv"
   "log"
   //"math/rand"
   //"time"
@@ -18,7 +18,8 @@ import (
 )
 
 //record the signal strengths value readings from the beacons
-var beaconValues BeaconValuesDatabase = BeaconValuesDatabase {Capacity: 6, Bmap: make(map[string][]BeaconRecord)}
+var beaconValues BeaconValuesDatabase
+var BeaconValuesDBCapacity int
 
 //check the beaconupdates sources' authenticity
 var check_req_auth = false
@@ -52,6 +53,19 @@ func main() {
 
   //setup the redis connection
   redisInit(os.Getenv("REDIS_IP"), os.Getenv("REDIS_PW"), false)
+  // setup the array's capacity value
+  bvc := os.Getenv("BEACON_VALUES_CAPACITY")
+  if len(bvc) == 0 {
+    BeaconValuesDBCapacity = 6
+  } else {
+    i, atoi_err := strconv.Atoi(bvc)
+    if atoi_err != nil {
+      BeaconValuesDBCapacity = 6
+    } else {
+      BeaconValuesDBCapacity = i
+    }
+  }
+  beaconValues = BeaconValuesDatabase {Capacity: BeaconValuesDBCapacity, Bmap: make(map[string][]BeaconRecord)}
 
   //the handler for ajax requests
   //http.HandleFunc("/ajax/createpost/", handleAjaxCreatePost)
