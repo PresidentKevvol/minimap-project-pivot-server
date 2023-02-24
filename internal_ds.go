@@ -90,6 +90,7 @@ type FingerprintDataCollectPayload struct {
   SourceDeviceId    string
   Points            []UserAccessPointInfo
   SpatialPosition   []float32
+  Note              string
 }
 
 type FingerprintDataPoint struct {

@@ -76,6 +76,11 @@ func handleBeaconUpdate(w http.ResponseWriter, r *http.Request) {
   //record to redis server too
   writeBeaconRecord(content_json.SourceName, record)
 
+  //store to sql server
+  if sql_dataset_mode {
+    storeBeaconRecord(beacon_name, record)
+  }
+
   //render template
   err = page_templates.ExecuteTemplate(w, "updateinfo.html", EmptyContext {})
   if err != nil { //if there is an error
@@ -130,6 +135,11 @@ func handleFingerprintDataCollect(w http.ResponseWriter, r *http.Request) {
   err = ioutil.WriteFile(fingerprint_data_storage + filename, obj, 0644)
   if err != nil { //if there is an error
     http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+
+  //store to sql server
+  if sql_dataset_mode {
+    storeCollectRecord(content_json)
   }
 
   //render template
