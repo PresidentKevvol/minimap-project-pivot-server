@@ -75,3 +75,35 @@ func writeBeaconRecord(name string, br BeaconRecord) {
     return
   }
 }
+
+func getAllBeaconRedingsRedis() BeaconValuesDatabase {
+  var res = BeaconValuesDatabase{Capacity: BeaconValuesDBCapacity, Bmap: make(map[string][]BeaconRecord)}
+  // run the scan command to get all beacon name strings
+  keys, _, sscanErr := rdb.SScan(ctx, "BeaconNames", 0, "*", 99).Result()
+  if sscanErr != nil {
+    fmt.Println(sscanErr)
+  }
+
+  // get item from each key
+  for _, key := range keys {
+    cur_readings, lrangeErr := rdb.LRange(ctx, "BeaconRecord-" + key, 0, int64(BeaconValuesDBCapacity)+1).Result()
+    if lrangeErr != nil {
+      fmt.Println(lrangeErr)
+    }
+
+    var cur_readings_objs []BeaconRecord
+    for _, reading := range cur_readings {
+      //decode the json string stored in the redis base
+      var content_json BeaconRecord
+      decodeErr := json.Unmarshal([]byte(reading), &content_json)
+      if decodeErr != nil {
+        fmt.Println(decodeErr)
+      }
+
+      //add each reading to slice
+      cur_readings_objs = append(cur_readings_objs, content_json)
+    }
+    res.Bmap[key] = cur_readings_objs
+  }
+  return res
+}

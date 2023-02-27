@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Lookup page</title>
+    <script src="/js/lookup.js"></script>
   </head>
   <body>
     <h2>Current beacon readings</h2>
@@ -16,25 +17,25 @@
         <th>RSSI</th>
       </tr>
       {{ range $key, $reading := .Bmap }}
-      <tr>
+      <tr class="beacon-row">
         <td>{{ $key }}</td>
-        <td></td>
+        <td><button class="beacon-expand-btn" bkey="{{ $key }}">+</button></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       {{ range $instance := $reading }}
-      <tr>
+      <tr hidden="hidden" class="record-row-{{ $key }}">
         <td></td>
         <td>{{ $instance.RecordTime.Format "2006-01-02 15:04:05.000" }}</td>
-        <td></td>
+        <td><button class="record-expand-btn" bkey="{{ $key }}-{{ $instance.RecordTime.Format "2006-01-02-15-04-05-.000" }}">+</button></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       {{ range $i := $instance.Points }}
-      <tr>
+      <tr hidden="hidden" class="record-point-row-{{ $key }} record-point-row-{{ $key }}-{{ $instance.RecordTime.Format "2006-01-02-15-04-05-.000" }}">
         <td></td>
         <td></td>
         <td>{{ $i.SSID }}</td>

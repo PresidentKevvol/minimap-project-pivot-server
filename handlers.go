@@ -78,7 +78,7 @@ func handleBeaconUpdate(w http.ResponseWriter, r *http.Request) {
 
   //store to sql server
   if sql_dataset_mode {
-    storeBeaconRecord(beacon_name, record)
+    storeBeaconRecord(content_json.SourceName, record)
   }
 
   //render template
@@ -90,8 +90,12 @@ func handleBeaconUpdate(w http.ResponseWriter, r *http.Request) {
 
 // the handler for displaying the debug page with lookup for the values
 func handleUpdateLookup(w http.ResponseWriter, r *http.Request) {
+  //get the values from the redis base
+  var bValuesRedis = getAllBeaconRedingsRedis()
   //render template
-  err := page_templates.ExecuteTemplate(w, "lookup.html", beaconValues)
+  //err := page_templates.ExecuteTemplate(w, "lookup.html", beaconValues)
+  err := page_templates.ExecuteTemplate(w, "lookup.html", bValuesRedis)
+
   if err != nil { //if there is an error
     http.Error(w, err.Error(), http.StatusInternalServerError)
   }
