@@ -1,7 +1,7 @@
 package main
 
 import (
-  //"fmt"
+  "fmt"
   "os"
   //"strings"
   //"strconv"
@@ -73,12 +73,22 @@ func handleBeaconUpdate(w http.ResponseWriter, r *http.Request) {
   dt := time.Now()   //record current time
   record := BeaconRecord {RecordTime: dt, Points: content_json.Points}
   beaconValues.Push(content_json.SourceName, record)
+
+  //now marshall the BeaconRecord to be fed to functions
+  //the converting and converting back is crucial in validating the data format/object schema
+  b, merr := json.Marshal(content_json)
+  if merr != nil {
+    fmt.Println(merr)
+    http.Error(w, merr.Error(), http.StatusInternalServerError)
+  }
+  var br = string(b)
+
   //record to redis server too
-  writeBeaconRecord(content_json.SourceName, record)
+  writeBeaconRecord(content_json.SourceName, br)
 
   //store to sql server
   if sql_dataset_mode {
-    storeBeaconRecord(content_json.SourceName, record)
+    storeBeaconRecord(content_json.SourceName, dt, br)
   }
 
   //render template
@@ -112,38 +122,50 @@ func handleFingerprintDataCollect(w http.ResponseWriter, r *http.Request) {
         return
   }
 
-  // retrieve latest reading of each beacon
-  brs := make(map[string][]AccessPointInfo)
-  for k, v := range beaconValues.Bmap {
-    pts := v[0].Points
-    brs[k] = pts
+  //now marshall the FingerprintDataCollectPayload to be fed to functions
+  //the converting and converting back is crucial in validating the data format/object schema
+  p, merr := json.Marshal(content_json)
+  if merr != nil {
+    fmt.Println(merr)
+    http.Error(w, merr.Error(), http.StatusInternalServerError)
   }
-
-  res := FingerprintDataPoint {
-    SourceName        : content_json.SourceName,
-    SourceDeviceId    : content_json.SourceDeviceId,
-    SourceReadings    : content_json.Points,
-    SpatialPosition   : content_json.SpatialPosition,
-    BeaconReadings    : brs,
-  }
+  var pl = string(p)
 
   dt := time.Now()   //record current time
-  filename := dt.Format("2006_01_02_15_04_05_000") + "-" + content_json.SourceName + ".json"
 
-  // write the point to a file
-  obj, err := json.Marshal(res)
-  //obj, err := json.MarshalIndent(res, "", " ")
-  if err != nil { //if there is an error
-    http.Error(w, err.Error(), http.StatusInternalServerError)
-  }
-  err = ioutil.WriteFile(fingerprint_data_storage + filename, obj, 0644)
-  if err != nil { //if there is an error
-    http.Error(w, err.Error(), http.StatusInternalServerError)
+  if file_dataset_mode {
+    // retrieve latest reading of each beacon
+    brs := make(map[string][]AccessPointInfo)
+    for k, v := range beaconValues.Bmap {
+      pts := v[0].Points
+      brs[k] = pts
+    }
+
+    res := FingerprintDataPoint {
+      SourceName        : content_json.SourceName,
+      SourceDeviceId    : content_json.SourceDeviceId,
+      SourceReadings    : content_json.Points,
+      SpatialPosition   : content_json.SpatialPosition,
+      BeaconReadings    : brs,
+    }
+
+    filename := dt.Format("2006_01_02_15_04_05_000") + "-" + content_json.SourceName + ".json"
+
+    // write the point to a file
+    obj, err := json.Marshal(res)
+    //obj, err := json.MarshalIndent(res, "", " ")
+    if err != nil { //if there is an error
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+    err = ioutil.WriteFile(fingerprint_data_storage + filename, obj, 0644)
+    if err != nil { //if there is an error
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
   }
 
   //store to sql server
   if sql_dataset_mode {
-    storeCollectRecord(content_json)
+    storeCollectRecord(dt, pl)
   }
 
   //render template

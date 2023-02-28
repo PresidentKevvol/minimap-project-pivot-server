@@ -41,7 +41,7 @@ BeaconRecord-<name>: redis list for the records received from a beacon, one for 
 /*
 writes a BeaconRecord object to the redis base
 */
-func writeBeaconRecord(name string, br BeaconRecord) {
+func writeBeaconRecord(name string, br_marshalled string) {
   //check if name exist
   nameExist, err := rdb.SIsMember(ctx, "BeaconNames", name).Result()
   if err != nil {
@@ -57,13 +57,7 @@ func writeBeaconRecord(name string, br BeaconRecord) {
     }
   }
 
-  //now marshall the BeaconRecord and add to list
-  b, merr := json.Marshal(br)
-  if merr != nil {
-    fmt.Println(err)
-    return
-  }
-  _, err = rdb.LPush(ctx, "BeaconRecord-" + name, b).Result()
+  _, err = rdb.LPush(ctx, "BeaconRecord-" + name, br_marshalled).Result()
   if err != nil {
     fmt.Println(err)
     return

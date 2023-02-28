@@ -31,6 +31,7 @@ var fingerprint_data_storage string
 
 //SQL mode to write collected data (beacon + point client) to SQL server as dataset
 var sql_dataset_mode = false
+var file_dataset_mode = false
 
 func main() {
   //load the .env file
