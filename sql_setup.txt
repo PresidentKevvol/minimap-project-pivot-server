@@ -1,0 +1,22 @@
+CREATE USER minimap WITH ENCRYPTED PASSWORD '<password here>';
+CREATE DATABASE minimap_data_collect WITH OWNER minimap;
+
+\c minimap_data_collect;
+
+CREATE TABLE dataset_collection_beacon (
+   beacon_name VARCHAR (20)   NOT NULL,
+   record_time TIMESTAMPTZ    NOT NULL,
+   points      TEXT           NOT NULL
+);
+
+CREATE TABLE dataset_collection_client (
+    source_id   VARCHAR (30)   NOT NULL,
+    record_time TIMESTAMPTZ    NOT NULL,
+    points      TEXT           NOT NULL,
+    spatial_id  VARCHAR (40)   NOT NULL,
+    note        TEXT           NOT NULL
+);
+
+GRANT ALL ON ALL TABLES IN SCHEMA public to minimap;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public to minimap;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA public to minimap;

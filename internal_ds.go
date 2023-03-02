@@ -86,18 +86,16 @@ type PositioningRequestPayload struct {
 }
 
 type FingerprintDataCollectPayload struct {
-  SourceName        string
   SourceDeviceId    string
   Points            []UserAccessPointInfo
-  SpatialPosition   []float32
+  SpatialId         string
   Note              string
 }
 
 type FingerprintDataPoint struct {
-  SourceName        string
   SourceDeviceId    string
   SourceReadings    []UserAccessPointInfo
-  SpatialPosition   []float32
+  SpatialId         string
 
   BeaconReadings    map[string][]AccessPointInfo
 }

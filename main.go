@@ -51,12 +51,19 @@ func main() {
   http.HandleFunc("/f/", handleFingerprintDataCollect)
   http.HandleFunc("/c/", handleCalculatePositionNaive)
   http.HandleFunc("/l/", handleUpdateLookup)
+  http.HandleFunc("/ds/t/", handleDataCollectionToggle)
 
   //setup the auth passwords
   auth_pw_map["SBU-01"] = "cghj1A90tS3h7Msd"
 
   //setup the redis connection
   redisInit(os.Getenv("REDIS_IP"), os.Getenv("REDIS_PW"), false)
+  fmt.Println("redis connection has been setup.")
+  //setup the sql connection
+  if len(os.Getenv("SQL_IP")) > 0 {
+    sqlInit(os.Getenv("SQL_IP"), os.Getenv("SQL_USER"), os.Getenv("SQL_PW"), os.Getenv("SQL_DBNAME"))
+    fmt.Println("postgresql connection has been setup.")
+  }
   // setup the array's capacity value
   bvc := os.Getenv("BEACON_VALUES_CAPACITY")
   if len(bvc) == 0 {
