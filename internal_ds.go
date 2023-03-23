@@ -46,9 +46,10 @@ func (self *BeaconReadingsList) Push(br BeaconRecord) {
 */
 
 type BeaconValuesDatabase struct {
-  Capacity int
+  Capacity      int
   //Bmap map[string]BeaconReadingsList
-  Bmap map[string][]BeaconRecord
+  Bmap          map[string][]BeaconRecord
+  LastReceived  map[string]string
 }
 
 func (self *BeaconValuesDatabase) Push(name string, br BeaconRecord) {

@@ -15,7 +15,9 @@
         <th>BSSID</th>
         <th>Channel</th>
         <th>RSSI</th>
+        <th>Last Updated</th>
       </tr>
+      {{ $inters := .LastReceived }}
       {{ range $key, $reading := .Bmap }}
       <tr class="beacon-row">
         <td>{{ $key }}</td>
@@ -24,12 +26,14 @@
         <td></td>
         <td></td>
         <td></td>
+        <td>{{ index $inters $key }} &nbsp;&nbsp; ago</td>
       </tr>
       {{ range $instance := $reading }}
       <tr hidden="hidden" class="record-row-{{ $key }}">
         <td></td>
         <td>{{ $instance.RecordTime.Format "2006-01-02 15:04:05.000" }}</td>
         <td><button class="record-expand-btn" bkey="{{ $key }}-{{ $instance.RecordTime.Format "2006-01-02-15-04-05-.000" }}">+</button></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -42,6 +46,7 @@
         <td>{{ $i.BSSID }}</td>
         <td>{{ $i.Channel }}</td>
         <td>{{ $i.RSSI }}</td>
+        <td></td>
       </tr>
       {{ end }}
       {{ end }}

@@ -7,7 +7,7 @@ import (
   //"strconv"
   //"log"
   //"math/rand"
-  //"time"
+  "time"
   "context"
   "github.com/go-redis/redis/v9"
   "encoding/json"
@@ -71,7 +71,7 @@ func writeBeaconRecord(name string, br_marshalled string) {
 }
 
 func getAllBeaconRedingsRedis() BeaconValuesDatabase {
-  var res = BeaconValuesDatabase{Capacity: BeaconValuesDBCapacity, Bmap: make(map[string][]BeaconRecord)}
+  var res = BeaconValuesDatabase{Capacity: BeaconValuesDBCapacity, Bmap: make(map[string][]BeaconRecord), LastReceived: make(map[string]string)}
   // run the scan command to get all beacon name strings
   keys, _, sscanErr := rdb.SScan(ctx, "BeaconNames", 0, "*", 99).Result()
   if sscanErr != nil {
@@ -99,5 +99,19 @@ func getAllBeaconRedingsRedis() BeaconValuesDatabase {
     }
     res.Bmap[key] = cur_readings_objs
   }
+
+
+  time_cur := time.Now()
+  for _, key := range keys {
+    // latest update's time
+    latest_update := res.Bmap[key][0].RecordTime
+    time_diff := time_cur.Sub(latest_update)
+
+    res.LastReceived[key] = time_diff.Truncate(time.Millisecond * 100).String()
+  }
+
+  //res.LastReceived["bb"] = "30s ago"
+  //fmt.Printf("%+v\n", res.LastUpdated)
+
   return res
 }
