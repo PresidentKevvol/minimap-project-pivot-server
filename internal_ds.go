@@ -78,7 +78,7 @@ func (self *BeaconValuesDatabase) Push(name string, br BeaconRecord) {
 type UserAccessPointInfo struct {
   SSID      string
   BSSID     string
-  Quality   float32
+  RSSI      float32
 }
 
 type PositioningRequestPayload struct {
